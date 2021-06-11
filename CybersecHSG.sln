@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CybersecHSG.API", "CybersecHSG\CybersecHSG.API.csproj", "{21F9DEF9-E5AF-4B42-A8D8-6180820F7F38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CybersecHSG.ClientServer", "CybersecHSG\CybersecHSG.ClientServer.csproj", "{21F9DEF9-E5AF-4B42-A8D8-6180820F7F38}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CybersecHSG.Common", "CybersecHSG.Common\CybersecHSG.Common.csproj", "{62A1C4FC-CB74-45B0-8C0D-756785C3E4E5}"
 EndProject
