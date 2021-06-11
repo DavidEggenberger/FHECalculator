@@ -10,9 +10,9 @@
 <div class="ActivityContainer">
     @foreach (var item in activities)
     {
-        ActivityUI activityUI = item;
+        Activity activityUI = item;
         <div class="Activity">
-            <select @oninput="e => activityUI.METs = ActivitiesMapping[e.Value.ToString()]">
+            <select @oninput="e => activityUI.METs = ActivitiesMapping[e.Value.ToString()].ToString()">
                 @foreach (var opt in ActivitiesMapping)
                 {
                     <option>@opt.Key</option>
@@ -33,7 +33,7 @@
 @code{
     int Weight;
     int Result;
-    List<ActivityUI> activities;
+    List<Activity> activities;
     CalculationItem calculationItem;
     private static Encryptor _encryptor;
     private static Decryptor _decryptor;
@@ -42,7 +42,7 @@
     protected override async Task OnInitializedAsync()
     {
         calculationItem = new CalculationItem();
-        activities = new List<ActivityUI> { new() };
+        activities = new List<Activity> { new() };
         _context = SEALUtils.GetContext();
         var _keyGenerator = new KeyGenerator(_context);
         _keyGenerator.CreatePublicKey(out PublicKey publicKey);
@@ -57,8 +57,8 @@
         {
             return new Activity
             {
-                Duration = InputToBase64CipherText(a.Duration),
-                METs = InputToBase64CipherText(a.METs)
+                Duration = InputToBase64CipherText(int.Parse(a.Duration)),
+                METs = InputToBase64CipherText(int.Parse(a.METs))
             };
         }).ToList();
         HttpResponseMessage hrm = await htpClient.PostAsJsonAsync<CalculationItem>("calculation", calculationItem);
