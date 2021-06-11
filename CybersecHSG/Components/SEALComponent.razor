@@ -1,0 +1,88 @@
+﻿@using Microsoft.Research.SEAL
+@using CybersecHSG.Common.Utils
+@using CybersecHSG.Common.Models
+@using System.Text.Json
+@inject HttpClient htpClient
+
+<label>Your Weight in Kg:</label>
+<input @bind="Weight" min="0" type="number"/>
+
+<div class="ActivityContainer">
+    @foreach (var item in activities)
+    {
+        ActivityUI activityUI = item;
+        <div class="Activity">
+            <select @oninput="e => activityUI.METs = ActivitiesMapping[e.Value.ToString()]">
+                @foreach (var opt in ActivitiesMapping)
+                {
+                    <option>@opt.Key</option>
+                }
+            </select>
+            <label>Duration in minutes</label>
+            <input @bind="activityUI.Duration" min="0" type="number"/>
+        </div>     
+    }
+</div>
+
+<button @onclick="() => activities.Add(new())">Add activity</button>
+
+<button @onclick="async() => await Calculate()">Calculate</button>
+
+@Result
+
+@code{
+    int Weight;
+    int Result;
+    List<ActivityUI> activities;
+    CalculationItem calculationItem;
+    private static Encryptor _encryptor;
+    private static Decryptor _decryptor;
+    private static SEALContext _context;
+
+    protected override async Task OnInitializedAsync()
+    {
+        calculationItem = new CalculationItem();
+        activities = new List<ActivityUI> { new() };
+        _context = SEALUtils.GetContext();
+        var _keyGenerator = new KeyGenerator(_context);
+        _keyGenerator.CreatePublicKey(out PublicKey publicKey);
+        _encryptor = new Encryptor(_context, publicKey);
+        _decryptor = new Decryptor(_context, _keyGenerator.SecretKey);
+    }
+
+    public async Task Calculate()
+    {
+        calculationItem.Weight = InputToBase64CipherText(Weight);
+        calculationItem.Activities = activities.Select(a =>
+        {
+            return new Activity
+            {
+                Duration = InputToBase64CipherText(a.Duration),
+                METs = InputToBase64CipherText(a.METs)
+            };
+        }).ToList();
+        HttpResponseMessage hrm = await htpClient.PostAsJsonAsync<CalculationItem>("calculation", calculationItem);
+        string result = await hrm.Content.ReadAsStringAsync();
+        SummaryItem summaryItem = JsonSerializer.Deserialize<SummaryItem>(result, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        Ciphertext text = SEALUtils.BuildCiphertextFromBase64String(summaryItem.TotalKalories, _context);
+        var plaintext = new Plaintext();
+        _decryptor.Decrypt(text, plaintext);
+        Result = int.Parse(plaintext.ToString(), System.Globalization.NumberStyles.HexNumber);
+    }
+    public string InputToBase64CipherText(int input)
+    {
+        var plaintext = new Plaintext($"{input.ToString("X")}");
+        var ciphertextDistance = new Ciphertext();
+        _encryptor.Encrypt(plaintext, ciphertextDistance);
+
+        return SEALUtils.CiphertextToBase64String(ciphertextDistance);
+    }
+
+    public Dictionary<string, int> ActivitiesMapping = new Dictionary<string, int>
+    {
+        ["Pick your Activity"] = 0,
+        ["Basketball"] = 6,
+        ["Running"] = 14,
+        ["Gardening"] = 3
+    };
+}
