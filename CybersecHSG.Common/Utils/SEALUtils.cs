@@ -16,13 +16,6 @@ namespace CybersecHSG.Common.Utils
                 return Convert.ToBase64String(ms.ToArray());
             }
         }
-        public static string DoubleToBase64String(double value)
-        {
-            using (var ms = new MemoryStream(ASCIIEncoding.Default.GetBytes(value.ToString())))
-            {
-                return Convert.ToBase64String(ms.ToArray());
-            }
-        }
         public static Ciphertext BuildCiphertextFromBase64String(string base64, SEALContext context)
         {
             var payload = Convert.FromBase64String(base64);
@@ -33,46 +26,6 @@ namespace CybersecHSG.Common.Utils
                 ciphertext.Load(context, ms);
 
                 return ciphertext;
-            }
-        }
-        public static PublicKey BuildPublicKeyFromBase64String(string base64, SEALContext context)
-        {
-            var payload = Convert.FromBase64String(base64);
-
-            using (var ms = new MemoryStream(payload))
-            {
-                var publicKey = new PublicKey();
-                publicKey.Load(context, ms);
-
-                return publicKey;
-            }
-        }
-        public static SecretKey BuildSecretKeyFromBase64String(string base64, SEALContext context)
-        {
-            var payload = Convert.FromBase64String(base64);
-
-            using (var ms = new MemoryStream(payload))
-            {
-                var secretKey = new SecretKey();
-                secretKey.Load(context, ms);
-
-                return secretKey;
-            }
-        }
-        public static string SecretKeyToBase64String(SecretKey secretKey)
-        {
-            using (var ms = new MemoryStream())
-            {
-                secretKey.Save(ms);
-                return Convert.ToBase64String(ms.ToArray());
-            }
-        }
-        public static string PublicKeyToBase64String(PublicKey publicKey)
-        {
-            using (var ms = new MemoryStream())
-            {
-                publicKey.Save(ms);
-                return Convert.ToBase64String(ms.ToArray());
             }
         }
         public static SEALContext GetContext()

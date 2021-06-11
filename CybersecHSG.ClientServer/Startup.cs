@@ -26,6 +26,7 @@ namespace CybersecHSG.ClientServer
         {
             services.AddRazorPages();
             services.AddControllers();
+            services.AddApplicationInsightsTelemetry();
             services.AddServerSideBlazor();
             services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(Configuration["URL"]) });
         }
