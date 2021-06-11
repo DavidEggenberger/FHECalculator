@@ -10,7 +10,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace CybersecHSG
+namespace CybersecHSG.ClientServer
 {
     public class Startup
     {
